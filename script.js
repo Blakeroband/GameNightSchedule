@@ -60,7 +60,15 @@ days.forEach(day => {
     });
 });
 
-function renderTimeslotsGrid(selected=[]) {
+// Cycle states: 0 = blue check, 1 = red X, 2 = question mark
+const CYCLE_EMOJIS = ['✅', '❌', '❓'];
+function getDefaultSlotStates() {
+    const obj = {};
+    timeslots.forEach(slot => { obj[slot] = 0; });
+    return obj;
+}
+
+function renderTimeslotsGrid(selectedStates = {}) {
     timeslotsGrid.innerHTML = '';
     const table = document.createElement('table');
     let row = document.createElement('tr');
@@ -83,11 +91,23 @@ function renderTimeslotsGrid(selected=[]) {
     row = document.createElement('tr');
     timeslots.forEach(slot => {
         const td = document.createElement('td');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = slot;
-        if (selected.includes(slot)) checkbox.checked = true;
-        td.appendChild(checkbox);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'cycle-slot-btn';
+        let state = selectedStates[slot] ?? 0;
+        btn.textContent = CYCLE_EMOJIS[state];
+        btn.dataset.slot = slot;
+        btn.dataset.state = state;
+        btn.style.fontSize = '1.2em';
+        btn.style.background = 'none';
+        btn.style.border = 'none';
+        btn.style.cursor = 'pointer';
+        btn.addEventListener('click', function() {
+            let newState = (parseInt(this.dataset.state) + 1) % 3;
+            this.dataset.state = newState;
+            this.textContent = CYCLE_EMOJIS[newState];
+        });
+        td.appendChild(btn);
         row.appendChild(td);
     });
     table.appendChild(row);
@@ -96,15 +116,36 @@ function renderTimeslotsGrid(selected=[]) {
 
 function loadSchedules() {
     const schedules = JSON.parse(localStorage.getItem('schedules') || '[]');
+    // Find common available slots (all users have blue check, state 0)
+    let commonSlots = timeslots.filter(slot =>
+        schedules.length > 0 && schedules.every(user => {
+            if (!user.slots) return false;
+            // If using old array format, treat as available if included
+            if (Array.isArray(user.slots)) return user.slots.includes(slot);
+            // New object format: state 0 is blue check
+            return user.slots[slot] === 0;
+        })
+    );
+    const commonDiv = document.getElementById('common-availability');
+    if (commonDiv) {
+        if (commonSlots.length > 0) {
+            commonDiv.textContent = 'Everyone is available at: ' + commonSlots.join(', ');
+        } else {
+            commonDiv.textContent = 'No time works for everyone.';
+        }
+    }
     // Render header
     tableHeaderRow.innerHTML = '<th>Name</th>' + timeslots.map(slot => `<th>${slot}</th>`).join('') + '<th>Action</th>';
     // Render body
     tableBody.innerHTML = '';
     schedules.forEach(({ name, slots }, idx) => {
         const row = document.createElement('tr');
-            row.innerHTML = `<td>${name}</td>` +
-                timeslots.map(slot => `<td style="text-align:center;">${slots.includes(slot) ? '❌' : '✔️'}</td>`).join('') +
-                `<td><button class="clear-user-btn" data-idx="${idx}" style="padding:2px 8px; font-size:0.9em;">Clear</button></td>`;
+        row.innerHTML = `<td>${name}</td>` +
+            timeslots.map(slot => {
+                let state = (slots && typeof slots[slot] !== 'undefined') ? slots[slot] : 0;
+                return `<td style="text-align:center;">${CYCLE_EMOJIS[state]}</td>`;
+            }).join('') +
+            `<td><button class="clear-user-btn" data-idx="${idx}" style="padding:2px 8px; font-size:0.9em;">Clear</button></td>`;
         tableBody.appendChild(row);
     });
     // Add event listeners for clear buttons
@@ -123,21 +164,25 @@ form.addEventListener('submit', function(e) {
     e.preventDefault();
     const name = nameInput.value.trim();
     if (!name) return;
-    // Get checked slots
-    const checked = Array.from(timeslotsGrid.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
-    if (checked.length === 0) return;
+    // Get slot states
+    const slotStates = {};
+    timeslotsGrid.querySelectorAll('.cycle-slot-btn').forEach(btn => {
+        slotStates[btn.dataset.slot] = parseInt(btn.dataset.state);
+    });
+    // If all are default, don't save
+    if (Object.values(slotStates).every(v => v === 0)) return;
     let schedules = JSON.parse(localStorage.getItem('schedules') || '[]');
     // Update if name exists, else add
     const idx = schedules.findIndex(s => s.name.toLowerCase() === name.toLowerCase());
     if (idx >= 0) {
-        schedules[idx].slots = checked;
+        schedules[idx].slots = slotStates;
     } else {
-        schedules.push({ name, slots: checked });
+        schedules.push({ name, slots: slotStates });
     }
     localStorage.setItem('schedules', JSON.stringify(schedules));
     loadSchedules();
     form.reset();
-    renderTimeslotsGrid();
+    renderTimeslotsGrid(getDefaultSlotStates());
 });
 
 // When user types their name, prefill their slots if they exist
@@ -145,7 +190,7 @@ nameInput.addEventListener('input', function() {
     const name = nameInput.value.trim();
     let schedules = JSON.parse(localStorage.getItem('schedules') || '[]');
     const user = schedules.find(s => s.name.toLowerCase() === name.toLowerCase());
-    renderTimeslotsGrid(user ? user.slots : []);
+    renderTimeslotsGrid(user ? user.slots : getDefaultSlotStates());
 });
 
 // Initial load
