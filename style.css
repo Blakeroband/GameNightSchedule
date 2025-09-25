@@ -1,0 +1,81 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6fb;
+    margin: 0;
+    padding: 0;
+}
+/* Responsive container for wide tables */
+.container {
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 32px 24px;
+    overflow-x: auto;
+}
+h1 {
+    text-align: center;
+    color: #333;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+button {
+    background: #4f8cff;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.2s;
+}
+button:hover {
+    background: #2563eb;
+}
+table {
+    min-width: 700px;
+    width: 100%;
+    border-collapse: collapse;
+    background: #fafbff;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+th, td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    font-size: 0.95em;
+}
+th {
+    background: #f0f4fa;
+    font-weight: 600;
+}
+
+#timeslots-grid table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+#timeslots-grid th, #timeslots-grid td {
+    padding: 4px 6px;
+    text-align: center;
+    border-bottom: none;
+}
+#timeslots-grid tr:first-child th {
+    background: #e8eefa;
+}
+#timeslots-grid input[type="checkbox"] {
+    transform: scale(1.1);
+    cursor: pointer;
+}

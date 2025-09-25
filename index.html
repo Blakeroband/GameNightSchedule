@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Night Scheduler</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Game Night Scheduler</h1>
+        <form id="schedule-form">
+            <input type="text" id="name" placeholder="Your Name" required>
+            <div id="timeslots-grid" style="margin: 12px 0;"></div>
+            <button type="submit">Add/Update</button>
+        </form>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <button id="export-btn" type="button">Export Schedules</button>
+            <input id="import-input" type="file" accept="application/json" style="display:none;">
+            <button id="import-btn" type="button">Import Schedules</button>
+        </div>
+        <h2>Group Availability</h2>
+        <div style="overflow-x:auto;">
+            <table id="availability-table">
+                <thead>
+                    <tr id="table-header-row"></tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
