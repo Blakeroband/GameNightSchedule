@@ -134,7 +134,23 @@ function loadSchedules() {
     const commonDiv = document.getElementById('common-availability');
     if (commonDiv) {
         if (commonSlots.length > 0) {
-            commonDiv.textContent = 'Everyone is available at: ' + commonSlots.join(', ');
+            // Group slots by day (e.g. { Mon: ['6pm','7pm'], Tue: [...] })
+            const groups = {};
+            commonSlots.forEach(slot => {
+                const parts = slot.split(' ');
+                const day = parts[0];
+                const hour = parts.slice(1).join(' ');
+                if (!groups[day]) groups[day] = [];
+                groups[day].push(hour);
+            });
+            // Build HTML: each day on its own line with comma-separated times
+            let html = '<div>Everyone is available at:</div><div style="margin-top:6px;">';
+            Object.keys(groups).forEach(day => {
+                const times = groups[day].join(', ');
+                html += `<div><strong>${day}:</strong> ${times}</div>`;
+            });
+            html += '</div>';
+            commonDiv.innerHTML = html;
         } else {
             commonDiv.textContent = 'No time works for everyone.';
         }
