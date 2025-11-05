@@ -69,48 +69,53 @@ function getDefaultSlotStates() {
 }
 
 function renderTimeslotsGrid(selectedStates = {}) {
+    // Build a table where each row is a day and columns are hours
     timeslotsGrid.innerHTML = '';
     const table = document.createElement('table');
-    let row = document.createElement('tr');
-    days.forEach(day => {
+
+    // header row: empty corner then hour labels
+    const headerRow = document.createElement('tr');
+    const cornerTh = document.createElement('th');
+    cornerTh.textContent = '';
+    headerRow.appendChild(cornerTh);
+    hours.forEach(hour => {
         const th = document.createElement('th');
-        th.textContent = day;
-        th.colSpan = hours.length;
-        row.appendChild(th);
+        th.textContent = hour;
+        headerRow.appendChild(th);
     });
-    table.appendChild(row);
-    row = document.createElement('tr');
+    table.appendChild(headerRow);
+
+    // one row per day
     days.forEach(day => {
+        const row = document.createElement('tr');
+        const dayTh = document.createElement('th');
+        dayTh.textContent = day;
+        row.appendChild(dayTh);
         hours.forEach(hour => {
-            const th = document.createElement('th');
-            th.textContent = hour;
-            row.appendChild(th);
+            const slot = `${day} ${hour}`;
+            const td = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'cycle-slot-btn';
+            let state = (selectedStates && typeof selectedStates[slot] !== 'undefined') ? selectedStates[slot] : 0;
+            btn.textContent = CYCLE_EMOJIS[state];
+            btn.dataset.slot = slot;
+            btn.dataset.state = state;
+            btn.style.fontSize = '1.2em';
+            btn.style.background = 'none';
+            btn.style.border = 'none';
+            btn.style.cursor = 'pointer';
+            btn.addEventListener('click', function() {
+                let newState = (parseInt(this.dataset.state) + 1) % 3;
+                this.dataset.state = newState;
+                this.textContent = CYCLE_EMOJIS[newState];
+            });
+            td.appendChild(btn);
+            row.appendChild(td);
         });
+        table.appendChild(row);
     });
-    table.appendChild(row);
-    row = document.createElement('tr');
-    timeslots.forEach(slot => {
-        const td = document.createElement('td');
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'cycle-slot-btn';
-        let state = selectedStates[slot] ?? 0;
-        btn.textContent = CYCLE_EMOJIS[state];
-        btn.dataset.slot = slot;
-        btn.dataset.state = state;
-        btn.style.fontSize = '1.2em';
-        btn.style.background = 'none';
-        btn.style.border = 'none';
-        btn.style.cursor = 'pointer';
-        btn.addEventListener('click', function() {
-            let newState = (parseInt(this.dataset.state) + 1) % 3;
-            this.dataset.state = newState;
-            this.textContent = CYCLE_EMOJIS[newState];
-        });
-        td.appendChild(btn);
-        row.appendChild(td);
-    });
-    table.appendChild(row);
+
     timeslotsGrid.appendChild(table);
 }
 

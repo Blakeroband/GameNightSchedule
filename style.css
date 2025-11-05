@@ -42,7 +42,6 @@ button:hover {
     background: #2563eb;
 }
 table {
-    min-width: 700px;
     width: 100%;
     border-collapse: collapse;
     background: #fafbff;
@@ -63,12 +62,11 @@ th {
 
 #timeslots-grid table {
     width: 100%;
-    min-width: 700px;
     border-collapse: collapse;
     margin-bottom: 10px;
 }
 #timeslots-grid th, #timeslots-grid td {
-    padding: 4px 6px;
+    padding: 6px 8px;
     text-align: center;
     border-bottom: none;
 }
