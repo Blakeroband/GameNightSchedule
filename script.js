@@ -52,7 +52,7 @@ const timeslotsGrid = document.getElementById('timeslots-grid');
 
 // Define time slots (Mon-Sun, 6pm-11pm)
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const hours = ['6pm', '7pm', '8pm', '9pm', '10pm', '11pm'];
+const hours = ['4pm', '5pm', '6pm', '7pm', '8pm', '9pm', '10pm', '11pm', '12am', '1am'];
 const timeslots = [];
 days.forEach(day => {
     hours.forEach(hour => {
